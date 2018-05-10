@@ -22,6 +22,7 @@
 	\setcounter{currentpagecounter}{0}
 	\includepdf[pages=#1,pagecommand=\addlabelstoallincludedpages{#2}]{#3}}
 
+
 \begin{document}
 
 \input{frontpage.tex}
@@ -32,9 +33,11 @@
 \pagestyle{plain}
 
 \clearpage
-\modifiedincludepdf{-}{fil}{file.pdf}
+\modifiedincludepdf{-}{Somename_3_2018.05.09_18.13.45_'aaa'.pdf}
 \clearpage
-\modifiedincludepdf{-}{fil2}{file2.pdf}
+\modifiedincludepdf{-}{Somename_4_2018.05.09_18.13.12_'The quick brown fox jumps over the lazy dog'.pdf}
+\clearpage
+\modifiedincludepdf{-}{Somename_4_2018.05.09_18.13.45_'This is a test'.pdf}
 \clearpage
 
 \end{document}
