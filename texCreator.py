@@ -13,6 +13,7 @@ def mainTexCreator(files, path = '/tex/', fname = 'document.tex'):
 	preambleWriter(f)
 	documentWriter(files,f)
 	f.close()
+	print fname
 
 def preambleWriter(f):
 	f.write("\\documentclass{article}\n")
@@ -42,7 +43,6 @@ def preambleWriter(f):
 
 def documentWriter(files,f):
 	f.write("\n")
-
 	f.write("\\begin{document}\n\n")
 	f.write("\\input{frontpage.tex}\n")
 	f.write("\\newpage\n")
@@ -50,24 +50,22 @@ def documentWriter(files,f):
 	f.write("\\newpage\n")
 	f.write("\\setcounter{page}{1}\n")
 	f.write("\\pagestyle{plain}\n\n")
-
 	for i in range(len(files)):
 		f.write("\\clearpage\n")
 		f.write("\\modifiedincludepdf{-}{")
-		f.write(files[i].fname)
+		f.write(files[i].fid)
+		f.write("}{")
+		f.write(files[i].fid)
 		f.write("}\n")
-
 	f.write("\\clearpage\n\n")
 	f.write("\\end{document}")
 
 def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
 	fname = getcwd() + path + fname
 	f = open(fname,'w')
-	
 #	chapters = []
 #	for i in range(len(files)): 
 #		chapters.append(files[i].chapter)
-
 	f.write("%Table of contents\n")
 	f.write("\\Huge{\\bfseries Contents }\n")
 	f.write("\\vspace{10mm}\n\n")
@@ -75,7 +73,10 @@ def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
 	prevChapter = -1
 	for file in files:
 		if not prevChapter == file.chapter:
+			if prevChapter != -1 :
+				f.write("\\end{enumerate}\n")
 			f.write("\\vspace{0.5mm}\n")
+			f.write("\\noindent\n")
 			f.write("\\Large{\\textbf{Chapter ")
 			f.write(str(file.chapter))
 			f.write("}}\n")
@@ -83,39 +84,43 @@ def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
 			f.write("\\begin{enumerate}[leftmargin=4em]\n")
 			prevChapter = file.chapter
 
-		f.write("\\item[\\pageref{")
-		f.write(file.fname)
+		f.write("\t\\item[\\pageref{")
+		f.write(file.fid)
 		f.write(".1}.] \\textbf{\\hyperref[")
-		f.write(file.fname)
-		f.write(".1}.] \\textbf{\\hyperref[fil.1]{Headline}.}\n")
-
-
-
+		f.write(file.fid)
+		f.write(".1]{")
+		f.write(file.name)
+		f.write("}}. \\textit{")
+		f.write(file.date)
+		f.write(".} ")
+		f.write(file.comment)
+		f.write(".\n")
+		#\\textbf{\\hyperref[fil.1]{Headline}.}\n")
 		#	"filHere, the comment will appear.\n")
 		# f.write("\n")
 		# f.write("\n")
 		# f.write("\n")
 		# f.write("\n")
-
-
+	f.write("\\begin{enumerate}[leftmargin=4em]\n")
 
 
 def writeSampleFrontPage(path = '/tex/'):
 	frontpagename = getcwd() + path + "frontpage.tex"
-	f = open(frontpagename,'w')
-	f.write("% Just some frontpage. An example:\n")
-	f.write("\\pagestyle{empty}\n")
-	f.write("\\clearpage")
-	f.write("\\begin{center}\n\n")
-	f.write("\\vfill\n")
-	f.write("\\vspace*{4cm}\n")
-	f.write("\\Huge{\\bfseries Cource code}\n\n")
-	f.write("\\vspace{8mm}\n")
-	f.write("\\Huge{\\bfseries Cource name}\n\n")
-	f.write("\\vspace{8mm}\n")
-	f.write("\\Huge{\\bfseries Notes}\n\n")
-	f.write("\\vspace{8mm}\n")
-	f.write("\\Huge{\\bfseries year}\n\n")
-	f.write("\\vfill\n")
-	f.write("\\end{center}\n")
-	f.close()
+	if not p.exists(frontpagename):
+		f = open(frontpagename,'w')
+		f.write("% Just some frontpage. An example:\n")
+		f.write("\\pagestyle{empty}\n")
+		f.write("\\clearpage")
+		f.write("\\begin{center}\n\n")
+		f.write("\\vfill\n")
+		f.write("\\vspace*{4cm}\n")
+		f.write("\\Huge{\\bfseries Cource code}\n\n")
+		f.write("\\vspace{8mm}\n")
+		f.write("\\Huge{\\bfseries Cource name}\n\n")
+		f.write("\\vspace{8mm}\n")
+		f.write("\\Huge{\\bfseries Notes}\n\n")
+		f.write("\\vspace{8mm}\n")
+		f.write("\\Huge{\\bfseries year}\n\n")
+		f.write("\\vfill\n")
+		f.write("\\end{center}\n")
+		f.close()

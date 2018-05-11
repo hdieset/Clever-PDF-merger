@@ -8,8 +8,10 @@ for files in fileList:
 
 loadConfig()
 
-#initTex()
+initTex()
+copyPDFsToTemp(fileList)
 #writeSampleFrontPage()
 #writePreamble()
+writeSampleFrontPage()
 mainTexCreator(fileList)
 tocWriter(fileList)

@@ -2,6 +2,7 @@
 
 class PDF:
 	fname = ''
+	fid = ''
 	name = ''
 	chapter = 0
 	date = ''
@@ -10,6 +11,7 @@ class PDF:
 
 def PDFprint(pdf):
 	print 'File name:', pdf.fname 
+	print 'File id  :', pdf.fid 
 	print 'name     :', pdf.name 
 	print "chapter  :", pdf.chapter
 	print "date     :", pdf.date
@@ -21,5 +23,5 @@ class PATHS:
 	compiler  = ''
 	frontpage = ''
 
-class bookStructure:
-	chapters = []
+#class bookStructure:
+#	chapters = []

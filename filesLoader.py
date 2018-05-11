@@ -1,6 +1,7 @@
 from os import walk, getcwd, path
 import numpy as np
 from customTypes import *
+from shutil import copy2
 
 # Create list of pdf files in target folder
 def pdfFilesScraper(filepath):
@@ -15,16 +16,17 @@ def pdfFilesScraper(filepath):
 
 	return f
 
-def filenameSplitter(fnString, splitter = "_"):
-	fnList = fnString.split(splitter)
+def filenameSplitter(fnString, fid, fieldSeparator = "_", commentSeparator = "'"):
+	fnList = fnString.split(fieldSeparator)
 	formatted = PDF()
 	if len(fnList) == 5:
-		formatted.fname = fnString
+		formatted.fname   = fnString
+		formatted.fid 	  = 'f' + str(fid)
 		formatted.name 	  = fnList[0]
 		formatted.chapter = int(fnList[1])
 		formatted.date	  = fnList[2]
 		formatted.time 	  = fnList[3]
-		formatted.comment = fnList[4]
+		formatted.comment = fnList[4].split(commentSeparator)[1]
 		return formatted
 	else:
 		print "Filename:", fnString, "splitting failed."
@@ -35,9 +37,11 @@ def filesLoader(filepath = "/target" ):
 	filepath = getcwd() + filepath
 	rawFileList = pdfFilesScraper(filepath)
 	formattedList = []
+	noFiles = -1
 	if len(rawFileList):
 		for files in range(len(rawFileList)):
-			newFile = filenameSplitter(rawFileList[files])
+			noFiles = noFiles + 1
+			newFile = filenameSplitter(rawFileList[files], noFiles)
 			if newFile != 0:
 				formattedList.append(newFile)
 		return formattedList
@@ -70,3 +74,18 @@ def initConfigFile(f):
 	f.write("LaTeX compiler:C:/program files/blabla\n")
 	f.write("Frontpage path:/templates/frontpage.tex\n")
 	f.close()
+
+def copyPDFsToTemp(files, source = '/target/', dest = '/tex/'):
+	for file in files:
+		sourcePath = getcwd() + source + file.fname
+
+		src = open(sourcePath,'r')
+
+		destPath = getcwd() + dest + file.fid #+ ".pdf"
+
+		print destPath
+
+		destf = open(destPath, "w")
+		copy2(sourcePath, destPath)
+		src.close()
+		destf.close()
