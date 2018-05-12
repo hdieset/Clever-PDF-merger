@@ -3,8 +3,9 @@
 class PDF:
 	fname = ''
 	fid = ''
+	type = ''
 	name = ''
-	chapter = 0
+	num = 0
 	date = ''
 	time = ''
 	comment  = ''
@@ -12,16 +13,16 @@ class PDF:
 def PDFprint(pdf):
 	print 'File name:', pdf.fname 
 	print 'File id  :', pdf.fid 
+	print 'type     :', pdf.type 
 	print 'name     :', pdf.name 
-	print "chapter  :", pdf.chapter
+	print "number   :", pdf.num
 	print "date     :", pdf.date
 	print "time     :", pdf.time
 	print "comment  :", pdf.comment
 
-class PATHS:
-	pdfFolder = '/target'
-	compiler  = ''
-	frontpage = ''
-
-#class bookStructure:
-#	chapters = []
+class CONFIG:
+	pdfFolder   = '/target'
+	compiler    = ''
+	frontpage   = ''
+	field_sep   = '_'
+	comment_sep = "'"

@@ -13,7 +13,27 @@ def mainTexCreator(files, path = '/tex/', fname = 'document.tex'):
 	preambleWriter(f)
 	documentWriter(files,f)
 	f.close()
-	#print fname
+
+def writeSampleFrontPage(path = '/tex/'):
+	frontpagename = getcwd() + path + "frontpage.tex"
+	if not p.exists(frontpagename):
+		f = open(frontpagename,'w')
+		f.write("% Just some frontpage. An example:\n")
+		f.write("\\pagestyle{empty}\n")
+		f.write("\\clearpage")
+		f.write("\\begin{center}\n\n")
+		f.write("\\vfill\n")
+		f.write("\\vspace*{4cm}\n")
+		f.write("\\Huge{\\bfseries Cource code}\n\n")
+		f.write("\\vspace{8mm}\n")
+		f.write("\\Huge{\\bfseries Cource name}\n\n")
+		f.write("\\vspace{8mm}\n")
+		f.write("\\Huge{\\bfseries Notes}\n\n")
+		f.write("\\vspace{8mm}\n")
+		f.write("\\Huge{\\bfseries year}\n\n")
+		f.write("\\vfill\n")
+		f.write("\\end{center}\n")
+		f.close()
 
 def preambleWriter(f):
 	f.write("\\documentclass{article}\n")
@@ -39,7 +59,6 @@ def documentWriter(files,f):
 	f.write("\\input{toc.tex}\n")
 	f.write("\\newpage\n")
 	f.write("\\setcounter{page}{1}\n")
-	f.write("\\pagestyle{plain}\n\n")
 	for i in range(len(files)):
 		f.write("\\clearpage\n")
 		f.write("\\modifiedincludepdf{-}{")
@@ -59,6 +78,7 @@ def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
 	f.write("%Table of contents\n")
 	f.write("\\noindent\n")
 	f.write("\\Huge{\\bfseries Contents }\n")
+	f.write("\\phantomsection\\addcontentsline{toc}{section}{Contents}\n")
 	f.write("\\vspace{10mm}\n\n")
 
 	prevChapter = -1
@@ -86,32 +106,5 @@ def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
 		f.write(".} ")
 		f.write(file.comment)
 		f.write(".\n")
-		#\\textbf{\\hyperref[fil.1]{Headline}.}\n")
-		#	"filHere, the comment will appear.\n")
-		# f.write("\n")
-		# f.write("\n")
-		# f.write("\n")
-		# f.write("\n")
 	f.write("\\end{enumerate}\n")
 
-
-def writeSampleFrontPage(path = '/tex/'):
-	frontpagename = getcwd() + path + "frontpage.tex"
-	if not p.exists(frontpagename):
-		f = open(frontpagename,'w')
-		f.write("% Just some frontpage. An example:\n")
-		f.write("\\pagestyle{empty}\n")
-		f.write("\\clearpage")
-		f.write("\\begin{center}\n\n")
-		f.write("\\vfill\n")
-		f.write("\\vspace*{4cm}\n")
-		f.write("\\Huge{\\bfseries Cource code}\n\n")
-		f.write("\\vspace{8mm}\n")
-		f.write("\\Huge{\\bfseries Cource name}\n\n")
-		f.write("\\vspace{8mm}\n")
-		f.write("\\Huge{\\bfseries Notes}\n\n")
-		f.write("\\vspace{8mm}\n")
-		f.write("\\Huge{\\bfseries year}\n\n")
-		f.write("\\vfill\n")
-		f.write("\\end{center}\n")
-		f.close()
