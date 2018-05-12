@@ -13,7 +13,7 @@ def mainTexCreator(files, path = '/tex/', fname = 'document.tex'):
 	preambleWriter(f)
 	documentWriter(files,f)
 	f.close()
-	print fname
+	#print fname
 
 def preambleWriter(f):
 	f.write("\\documentclass{article}\n")
@@ -30,16 +30,6 @@ def preambleWriter(f):
 	f.write("\ttop=1in,\n")
 	f.write("\tbottom=0.8in\n")
 	f.write("}\n")
-	f.write("\\newcounter{includepdfpage}\n")
-	f.write("\\newcounter{currentpagecounter}\n")
-	f.write("\\newcommand{\\addlabelstoallincludedpages}[1]{\n")
-	f.write("\t\\refstepcounter{includepdfpage}\n")
-	f.write("\t\\stepcounter{currentpagecounter}\n")
-	f.write("\t\\label{#1.\\thecurrentpagecounter}}\n")
-	f.write("\\newcommand{\\modifiedincludepdf}[3]{\n")
-	f.write("\t\\setcounter{currentpagecounter}{0}\n")
-	f.write("\t\\includepdf[pages=#1,pagecommand=\\addlabelstoallincludedpages{#2}]{#3}}\n")
-	f.write("\n")
 
 def documentWriter(files,f):
 	f.write("\n")
@@ -56,7 +46,7 @@ def documentWriter(files,f):
 		f.write(files[i].fid)
 		f.write("}{")
 		f.write(files[i].fid)
-		f.write("}\n")
+		f.write(".pdf}\n")
 	f.write("\\clearpage\n\n")
 	f.write("\\end{document}")
 
@@ -67,6 +57,7 @@ def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
 #	for i in range(len(files)): 
 #		chapters.append(files[i].chapter)
 	f.write("%Table of contents\n")
+	f.write("\\noindent\n")
 	f.write("\\Huge{\\bfseries Contents }\n")
 	f.write("\\vspace{10mm}\n\n")
 
@@ -101,7 +92,7 @@ def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
 		# f.write("\n")
 		# f.write("\n")
 		# f.write("\n")
-	f.write("\\begin{enumerate}[leftmargin=4em]\n")
+	f.write("\\end{enumerate}\n")
 
 
 def writeSampleFrontPage(path = '/tex/'):

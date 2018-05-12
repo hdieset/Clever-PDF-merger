@@ -78,14 +78,5 @@ def initConfigFile(f):
 def copyPDFsToTemp(files, source = '/target/', dest = '/tex/'):
 	for file in files:
 		sourcePath = getcwd() + source + file.fname
-
-		src = open(sourcePath,'r')
-
-		destPath = getcwd() + dest + file.fid #+ ".pdf"
-
-		print destPath
-
-		destf = open(destPath, "w")
-		copy2(sourcePath, destPath)
-		src.close()
-		destf.close()
+		destPath = getcwd() + dest + file.fid + ".pdf"
+		copy2(sourcePath,destPath)
