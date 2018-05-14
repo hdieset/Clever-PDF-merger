@@ -3,11 +3,12 @@ import numpy as np
 from customTypes import *
 from shutil import copy2
 
+
 def loadConfig(fname = "config.txt"):
 	if not path.exists(fname):
 		f = open(fname,"w")
 		initConfigFile(f)
-		print "No config file detected. Created one. Please fill inn fields."
+		print("No config file detected. Created one. Please fill inn fields.")
 		return 0
 	else:
 		with open(fname,'r') as f:
@@ -16,6 +17,8 @@ def loadConfig(fname = "config.txt"):
 			for line in f:
 				if line.startswith("Target folder  :"):
 					configs.target = line[16:-1]
+				elif line.startswith("Temp folder    :"):
+					configs.temp_folder = line[16:-1]
 				elif line.startswith("LaTeX compiler :"):
 					configs.compiler = line[16:-1]
 				elif line.startswith("Frontpage path :"):
@@ -24,7 +27,26 @@ def loadConfig(fname = "config.txt"):
 					configs.field_sep = line[16:-1]
 				elif line.startswith("Comment between:"):
 					configs.comment_sep = line[16:-1]
+				elif line.startswith("Delete temp after completion (y/n):"):
+					configs.delTempPost = line[35:36]
 		return configs
+
+
+def initConfigFile(f):
+	f.write("----------------Paths----------------\n")
+	f.write("Target folder  :/target\n")
+	f.write("Temp folder    :/tex\n")
+	f.write("LaTeX compiler :C:/program files/blabla\n")
+	f.write("Frontpage path :/templates/frontpage.tex\n")
+	f.write("Field separator:_\n")
+	f.write("Comment between:'\n\n")
+	f.write("Delete temp after completion (y/n):n\n")
+	f.write("File scraping profiles\n")
+	f.write("Lectures     :L_date_number_name_'comment'\n")
+	f.write("Problem set  :PS_date_number\n")
+	f.write("Exam relevant:ER_date_comment\n")
+	f.close()
+
 
 def filesLoader(filepath = "/target", fieldSeparator = "_", commentSeparator = "'"):
 	filepath = getcwd() + filepath
@@ -47,60 +69,51 @@ def filesLoader(filepath = "/target", fieldSeparator = "_", commentSeparator = "
 				formattedList.append(newFile)
 		return formattedList
 	else:
-		print "No PDF files found."
+		print("No PDF files found.")
 		return 0
 
 
 def filenameSplitter(fnString, fid, fieldSeparator = "_", commentSeparator = "'"):
 	fnList = fnString.split(fieldSeparator)
 	formatted = PDF()
+
 	# Lecture case:
 	if fnList[0] == "L":
-		formatted.type    = fnString[0]
-		formatted.num     = fnString[1]
-		formatted.name    = fnString[2]
-		formatted.date    = fnString[3]
-		formatted.comment = fnString[4].split(commentSeparator)[1]
 		formatted.fname   = fnString
 		formatted.fid 	  = 'f' + str(fid)
+		formatted.type    = fnList[0]
+		formatted.date    = fnList[1]
+		formatted.time	  = fnList[2]
+		formatted.num     = fnList[3]
+		formatted.name    = fnList[4]
+		formatted.comment = fnList[5].split(commentSeparator)[1]
+
 	# Problem set case:
 	elif fnList[0] == "PS":
-		formatted.type    = fnString[0]
-		formatted.num   = fnString[1]
-		formatted.date  = fnString[2]
 		formatted.fname = fnString
 		formatted.fid   = 'f' + str(fid)
+		formatted.type  = fnList[0]
+		formatted.date  = fnList[1]
+		formatted.time  = fnList[2]
+		formatted.num   = fnList[3]
+	
+	# Exam relevant case:
 	elif fnList[0] == "ER":
-		formatted.type    = fnString[0]
-		formatted.date    = fnString[1]
-		formatted.comment = fnString[2].split(commentSeparator)[1]
 		formatted.fname   = fnString
 		formatted.fid 	  = 'f' + str(fid)
-#	if len(fnList) == 5:
-#		formatted.fname   = fnString
-#		formatted.fid 	  = 'f' + str(fid)
-#		formatted.name 	  = fnList[0]
-#		formatted.chapter = int(fnList[1])
-#		formatted.date	  = fnList[2]
-#		formatted.time 	  = fnList[3]
-#		formatted.comment = fnList[4]
-#		return formatted
+		formatted.type    = fnList[0]
+		formatted.date    = fnList[1]
+		formatted.time	  = fnList[2]
+		formatted.comment = fnList[3].split(commentSeparator)[1]
+
+	# If not implemented file syntax:
 	else:
-		print "Filename:", fnString, "splitting failed."
-		print "Naming convention described in config.txt not used."
-		return 0
+		print("Filename:", fnString, "splitting failed.")
+		print("Naming convention described in config.txt not used.")
+		formatted = 0
 
+	return formatted
 
-
-
-def initConfigFile(f):
-	f.write("----------------Paths----------------\n")
-	f.write("Target folder  :/target\n")
-	f.write("LaTeX compiler :C:/program files/blabla\n")
-	f.write("Frontpage path :/templates/frontpage.tex\n")
-	f.write("Field separator:_\n")
-	f.write("Comment between:'\n")
-	f.close()
 
 def copyPDFsToTemp(files, source = '/target/', dest = '/tex/'):
 	for file in files:

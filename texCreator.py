@@ -7,15 +7,9 @@ def initTex(path = '/tex'):
 	if not p.exists(path):
 		makedirs(path)
 
-def mainTexCreator(files, path = '/tex/', fname = 'document.tex'):
-	fname = getcwd() + path + fname
-	f = open(fname,'w')
-	preambleWriter(f)
-	documentWriter(files,f)
-	f.close()
 
-def writeSampleFrontPage(path = '/tex/'):
-	frontpagename = getcwd() + path + "frontpage.tex"
+def writeFrontPage(path = '/tex/', fname = "/frontpage.tex"):
+	frontpagename = getcwd() + path + fname
 	if not p.exists(frontpagename):
 		f = open(frontpagename,'w')
 		f.write("% Just some frontpage. An example:\n")
@@ -35,10 +29,17 @@ def writeSampleFrontPage(path = '/tex/'):
 		f.write("\\end{center}\n")
 		f.close()
 
+
+def mainTexCreator(files, path = '/tex/', fname = '/document.tex'):
+	fname = getcwd() + path + fname
+	f = open(fname,'w')
+	preambleWriter(f)
+	documentWriter(files,f)
+	f.close()
+
 def preambleWriter(f):
 	f.write("\\documentclass{article}\n")
 	f.write("\\usepackage{etoolbox}\n")
-	f.write("\\patchcmd{\\chapter}{plain}{empty}{}{}\n")
 	f.write("\\usepackage[final]{pdfpages}\n")
 	f.write("\\usepackage{hyperref}\n")
 	f.write("\\usepackage{enumitem}\n")
@@ -57,54 +58,156 @@ def documentWriter(files,f):
 	f.write("\\input{frontpage.tex}\n")
 	f.write("\\newpage\n")
 	f.write("\\input{toc.tex}\n")
+	f.write("\\phantomsection\\addcontentsline{toc}{section}{Contents}\n")
 	f.write("\\newpage\n")
-	f.write("\\setcounter{page}{1}\n")
-	for i in range(len(files)):
-		f.write("\\clearpage\n")
-		f.write("\\modifiedincludepdf{-}{")
-		f.write(files[i].fid)
-		f.write("}{")
-		f.write(files[i].fid)
-		f.write(".pdf}\n")
+	f.write("\\setcounter{page}{1}\n\n")
+
+	lectureFiles      = []
+	problemSetfiles   = []
+	examRelevantFiles = []
+	for file in files:
+		if file.type == "L":
+			lectureFiles.append(file)
+		elif file.type == "PS":
+			problemSetfiles.append(file)
+		elif file.type == "ER":
+			examRelevantFiles.append(file)
+
+	writePDFimports2mainTex(f,lectureFiles,"Lectures","name")
+	writePDFimports2mainTex(f,problemSetfiles,"Problem Sets","num")
+	writePDFimports2mainTex(f,examRelevantFiles,"Exam Relevant","date")
+
 	f.write("\\clearpage\n\n")
 	f.write("\\end{document}")
 
-def tocWriter(files, path = '/tex/', fname = 'toc.tex'):
+def writePDFimports2mainTex(out, files, chapTitle, subChapElem):
+	if len(files) > 0:
+		out.write("\\includepdf[pages=1,pagecommand={")
+		out.write("\\thispagestyle{plain},")
+		out.write("\\phantomsection\\addcontentsline{toc}{section}{")
+		out.write(chapTitle)
+		out.write("},\\phantomsection\\addcontentsline{toc}{subsection}{")
+		out.write(getattr(files[0], subChapElem))
+		out.write("},\\label{")
+		out.write(files[0].fid)
+		out.write("}}]{")
+		out.write(files[0].fid)
+		out.write(".pdf}\n")
+		out.write("\\includepdf[pages=2-,pagecommand={")
+		out.write("\\thispagestyle{plain}")
+		out.write("}]{")
+		out.write(files[0].fid)
+		out.write(".pdf}\n\n")
+		
+		if len(files) > 1:
+			for file in files[1:]:
+				out.write("\\includepdf[pages=1,pagecommand={")
+				out.write("\\thispagestyle{plain},")
+				out.write("\\phantomsection\\addcontentsline{toc}{subsection}{")
+				out.write(getattr(file, subChapElem))
+				out.write("},\\label{")
+				out.write(file.fid)
+				out.write("}}]{")
+				out.write(file.fid)
+				out.write(".pdf}\n")
+				out.write("\\includepdf[pages=2-,pagecommand={")
+				out.write("\\thispagestyle{plain}")
+				out.write("}]{")
+				out.write(file.fid)
+				out.write(".pdf}\n\n")
+
+
+def tocWriter(files, path = '/tex/', fname = '/toc.tex'):
 	fname = getcwd() + path + fname
 	f = open(fname,'w')
-#	chapters = []
-#	for i in range(len(files)): 
-#		chapters.append(files[i].chapter)
 	f.write("%Table of contents\n")
 	f.write("\\noindent\n")
-	f.write("\\Huge{\\bfseries Contents }\n")
-	f.write("\\phantomsection\\addcontentsline{toc}{section}{Contents}\n")
+	f.write("\\Huge{\\textbf{Contents}}\n")
 	f.write("\\vspace{10mm}\n\n")
 
-	prevChapter = -1
+	lectureFiles      = []
+	problemSetfiles   = []
+	examRelevantFiles = []
 	for file in files:
-		if not prevChapter == file.chapter:
-			if prevChapter != -1 :
-				f.write("\\end{enumerate}\n")
-			f.write("\\vspace{0.5mm}\n")
-			f.write("\\noindent\n")
-			f.write("\\Large{\\textbf{Chapter ")
-			f.write(str(file.chapter))
-			f.write("}}\n")
-			f.write("\\normalsize\n")
-			f.write("\\begin{enumerate}[leftmargin=4em]\n")
-			prevChapter = file.chapter
+		if file.type == "L":
+			lectureFiles.append(file)
+		elif file.type == "PS":
+			problemSetfiles.append(file)
+		elif file.type == "ER":
+			examRelevantFiles.append(file)
 
-		f.write("\t\\item[\\pageref{")
-		f.write(file.fid)
-		f.write(".1}.] \\textbf{\\hyperref[")
-		f.write(file.fid)
-		f.write(".1]{")
-		f.write(file.name)
-		f.write("}}. \\textit{")
-		f.write(file.date)
-		f.write(".} ")
-		f.write(file.comment)
-		f.write(".\n")
-	f.write("\\end{enumerate}\n")
+	lecture2TOCwriter(lectureFiles,f,"Lectures")
+	problemSet2TOCwriter(problemSetfiles,f,"Problem Sets")
+	examRelecant2TOCwriter(examRelevantFiles,f,"Exam relevant")
+
+	f.close()
+
+def lecture2TOCwriter(files,out,chapTitle):
+	if len(files) > 0:
+		out.write("\\vspace{0.5mm}")
+		out.write("\\noindent")
+		out.write("\\Large{\\textbf{")
+		out.write(chapTitle)
+		out.write("}}\n")
+		out.write("\\normalsize\n")
+		out.write("\\begin{enumerate}[leftmargin=4em]\n")
+		for file in files:
+			out.write("\\item[\\pageref{")
+			out.write(file.fid)
+			out.write("}.] ")
+			out.write(" \\hyperref[")
+			out.write(file.fid)
+			out.write("]{\\textbf{")
+			out.write(file.num)
+			out.write(" ")
+			out.write(file.name)
+			out.write("}}. \\textit{")
+			out.write(file.date)
+			out.write(".} ")
+			out.write(file.comment)
+			out.write("\n")
+		out.write("\\end{enumerate}\n\n")
+
+def problemSet2TOCwriter(files,out,chapTitle):
+	if len(files) > 0:
+		out.write("\\vspace{0.5mm}")
+		out.write("\\noindent")
+		out.write("\\Large{\\textbf{")
+		out.write(chapTitle)
+		out.write("}}\n")
+		out.write("\\normalsize\n")
+		out.write("\\begin{enumerate}[leftmargin=4em]\n")
+		for file in files:
+			out.write("\\item[\\pageref{")
+			out.write(file.fid)
+			out.write("}.] ")
+			out.write("\\hyperref[")
+			out.write(file.fid)
+			out.write("]{\\textbf{")
+			out.write(file.num)
+			out.write("}. \\textit{")
+			out.write(file.date)
+			out.write(".}} \n")
+		out.write("\\end{enumerate}\n\n")
+
+def examRelecant2TOCwriter(files,out,chapTitle):
+	if len(files) > 0:
+		out.write("\\vspace{0.5mm}")
+		out.write("\\noindent")
+		out.write("\\Large{\\textbf{")
+		out.write(chapTitle)
+		out.write("}}\n")
+		out.write("\\normalsize\n")
+		out.write("\\begin{enumerate}[leftmargin=4em]\n")
+		for file in files:
+			out.write("\\item[\\pageref{")
+			out.write(file.fid)
+			out.write("}.] ")
+			out.write("\\hyperref[")
+			out.write(file.fid)
+			out.write("]{")
+			out.write("\\textit{")
+			out.write(file.date)
+			out.write(".}} \n")
+		out.write("\\end{enumerate}\n\n")
 
