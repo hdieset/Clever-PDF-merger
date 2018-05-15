@@ -224,10 +224,11 @@ def runLaTeXcompiler(projFolder = "/tex/", frontPagePath = "/frontpage.tex", mai
 	p.wait()
 
 
-def moveFinalPDF(srcFldr = "/tex/", srcName = "document.pdf", dest = "/", outName = "notes.pdf"):
+def moveFinalPDF(srcFldr = "/tex/", srcName = "document.pdf", dest = "/Notes.pdf"):
 	sourcePath = getcwd() + srcFldr + srcName
-	destPath = getcwd() + dest + outName
+	destPath = getcwd() + dest
 	copy2(sourcePath,destPath)
+
 
 def clearTempFolder(cmd = "n",delFldr = "/tex/"):
 	if cmd == "y":

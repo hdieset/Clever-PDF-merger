@@ -22,6 +22,8 @@ def loadConfig(fname = "config.txt"):
 				configs.temp_folder = line[16:-1]
 			elif line.startswith("Frontpage path :"):
 				configs.frontpage = line[16:-1]
+			elif line.startswith("Output filename:"):
+				configs.outfile = line[16:-1]
 			elif line.startswith("Field separator:"):
 				configs.field_sep = line[16:-1]
 			elif line.startswith("Comment between:"):
@@ -36,6 +38,7 @@ def initConfigFile(f):
 	f.write("Target folder  :/target/\n")
 	f.write("Temp folder    :/tex/\n")
 	f.write("Frontpage path :/frontpage.tex\n")
+	f.write("Output filename:/Notes.pdf\n")
 	f.write("Field separator:_\n")
 	f.write("Comment between:'\n")
 	f.write("Delete temp after completion (y/n):n\n\n")
