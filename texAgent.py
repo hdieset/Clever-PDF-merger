@@ -1,6 +1,8 @@
 # Creates LaTeX project that creates the final output PDF.
 from os import getcwd, makedirs
 from os import path as p
+from subprocess import Popen, DEVNULL
+from shutil import copy2, rmtree
 
 def initTex(path = '/tex'):
 	path = getcwd() + path
@@ -8,8 +10,8 @@ def initTex(path = '/tex'):
 		makedirs(path)
 
 
-def writeFrontPage(path = '/tex/', fname = "/frontpage.tex"):
-	frontpagename = getcwd() + path + fname
+def writeFrontPage(pathToFrontpage = '/tex/'):
+	frontpagename = getcwd() + pathToFrontpage 
 	if not p.exists(frontpagename):
 		f = open(frontpagename,'w')
 		f.write("% Just some frontpage. An example:\n")
@@ -211,3 +213,22 @@ def examRelecant2TOCwriter(files,out,chapTitle):
 			out.write(".}} \n")
 		out.write("\\end{enumerate}\n\n")
 
+
+def runLaTeXcompiler(projFolder = "/tex/", frontPagePath = "/frontpage.tex", mainDoc = "document.tex"):
+	projPath = getcwd() + projFolder
+	copy2(getcwd()+frontPagePath,projPath+frontPagePath)
+	# Compile twice to ensure hyperlinks is rendered correctly
+	p = Popen(["pdflatex", "-synctex=1", "-interaction=nonstopmode", mainDoc], cwd = projPath, stdout=DEVNULL)
+	p.wait()
+	p = Popen(["pdflatex", "-synctex=1", "-interaction=nonstopmode", mainDoc], cwd = projPath, stdout=DEVNULL)
+	p.wait()
+
+
+def moveFinalPDF(srcFldr = "/tex/", srcName = "document.pdf", dest = "/", outName = "notes.pdf"):
+	sourcePath = getcwd() + srcFldr + srcName
+	destPath = getcwd() + dest + outName
+	copy2(sourcePath,destPath)
+
+def clearTempFolder(cmd = "n",delFldr = "/tex/"):
+	if cmd == "y":
+		rmtree(getcwd()+delFldr, ignore_errors=True)

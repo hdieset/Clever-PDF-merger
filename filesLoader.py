@@ -9,38 +9,36 @@ def loadConfig(fname = "config.txt"):
 		f = open(fname,"w")
 		initConfigFile(f)
 		print("No config file detected. Created one. Please fill inn fields.")
+		exit()
 		return 0
-	else:
-		with open(fname,'r') as f:
-			# Get path data from config file
-			configs = CONFIG()
-			for line in f:
-				if line.startswith("Target folder  :"):
-					configs.target = line[16:-1]
-				elif line.startswith("Temp folder    :"):
-					configs.temp_folder = line[16:-1]
-				elif line.startswith("LaTeX compiler :"):
-					configs.compiler = line[16:-1]
-				elif line.startswith("Frontpage path :"):
-					configs.frontpage = line[16:-1]
-				elif line.startswith("Field separator:"):
-					configs.field_sep = line[16:-1]
-				elif line.startswith("Comment between:"):
-					configs.comment_sep = line[16:-1]
-				elif line.startswith("Delete temp after completion (y/n):"):
-					configs.delTempPost = line[35:36]
-		return configs
+
+	with open(fname,'r') as f:
+		# Get path data from config file
+		configs = CONFIG()
+		for line in f:
+			if line.startswith("Target folder  :"):
+				configs.pdfFolder = line[16:-1]
+			elif line.startswith("Temp folder    :"):
+				configs.temp_folder = line[16:-1]
+			elif line.startswith("Frontpage path :"):
+				configs.frontpage = line[16:-1]
+			elif line.startswith("Field separator:"):
+				configs.field_sep = line[16:-1]
+			elif line.startswith("Comment between:"):
+				configs.comment_sep = line[16:-1]
+			elif line.startswith("Delete temp after completion (y/n):"):
+				configs.delTemp = line[35:36]
+	return configs
 
 
 def initConfigFile(f):
 	f.write("----------------Paths----------------\n")
-	f.write("Target folder  :/target\n")
-	f.write("Temp folder    :/tex\n")
-	f.write("LaTeX compiler :C:/program files/blabla\n")
-	f.write("Frontpage path :/templates/frontpage.tex\n")
+	f.write("Target folder  :/target/\n")
+	f.write("Temp folder    :/tex/\n")
+	f.write("Frontpage path :/frontpage.tex\n")
 	f.write("Field separator:_\n")
-	f.write("Comment between:'\n\n")
-	f.write("Delete temp after completion (y/n):n\n")
+	f.write("Comment between:'\n")
+	f.write("Delete temp after completion (y/n):n\n\n")
 	f.write("File scraping profiles\n")
 	f.write("Lectures     :L_date_number_name_'comment'\n")
 	f.write("Problem set  :PS_date_number\n")
@@ -56,8 +54,8 @@ def filesLoader(filepath = "/target", fieldSeparator = "_", commentSeparator = "
 		break
 
 	for files in range(len(rawFileList)):
-		if not rawFileList[files-1].endswith(".pdf"):
-			del rawFileList[files-1]
+		if not rawFileList[files].endswith(".pdf"):
+			del rawFileList[files]
 
 	formattedList = []
 	noFiles = -1
@@ -69,7 +67,8 @@ def filesLoader(filepath = "/target", fieldSeparator = "_", commentSeparator = "
 				formattedList.append(newFile)
 		return formattedList
 	else:
-		print("No PDF files found.")
+		print("No PDF files found in folder " + filepath)
+		exit()
 		return 0
 
 

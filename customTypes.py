@@ -21,10 +21,9 @@ def PDFprint(pdf):
 	print("comment  :", pdf.comment)
 
 class CONFIG:
-	pdfFolder   = '/target'
-	temp_folder = '/tex/'
-	compiler    = ''
-	frontpage   = ''
+	pdfFolder   = "/target/"
+	temp_folder = "/tex/"
+	frontpage   = "/frontpage.tex"
 	field_sep   = "_"
 	comment_sep = "'"
-	delTempPost = 'n' # y/n
+	delTemp     = 'n' # y/n
