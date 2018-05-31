@@ -13,7 +13,7 @@ def initTex(path = '/tex'):
 def writeFrontPage(pathToFrontpage = '/tex/'):
 	frontpagename = getcwd() + pathToFrontpage 
 	if not p.exists(frontpagename):
-		f = open(frontpagename,'w')
+		f = open(frontpagename,'w',encoding='utf-8')
 		f.write("% Just some frontpage. An example:\n")
 		f.write("\\pagestyle{empty}\n")
 		f.write("\\clearpage")
@@ -34,7 +34,7 @@ def writeFrontPage(pathToFrontpage = '/tex/'):
 
 def mainTexCreator(files, path = '/tex/', fname = '/document.tex'):
 	fname = getcwd() + path + fname
-	f = open(fname,'w')
+	f = open(fname,'w',encoding='utf-8')
 	preambleWriter(f)
 	documentWriter(files,f)
 	f.close()
@@ -75,21 +75,29 @@ def documentWriter(files,f):
 		elif file.type == "ER":
 			examRelevantFiles.append(file)
 
-	writePDFimports2mainTex(f,lectureFiles,"Lectures","name")
+	writePDFimports2mainTex(f,lectureFiles,"Lectures","name", True)
 	writePDFimports2mainTex(f,problemSetfiles,"Problem Sets","num")
-	writePDFimports2mainTex(f,examRelevantFiles,"Exam Relevant","date")
+	writePDFimports2mainTex(f,examRelevantFiles,"Exam Relevant","comment")
 
 	f.write("\\clearpage\n\n")
 	f.write("\\end{document}")
 
-def writePDFimports2mainTex(out, files, chapTitle, subChapElem):
+def writePDFimports2mainTex(out, files, chapTitle, subChapElem, includeNum = False):
 	if len(files) > 0:
 		out.write("\\includepdf[pages=1,pagecommand={")
 		out.write("\\thispagestyle{plain},")
 		out.write("\\phantomsection\\addcontentsline{toc}{section}{")
 		out.write(chapTitle)
 		out.write("},\\phantomsection\\addcontentsline{toc}{subsection}{")
-		out.write(getattr(files[0], subChapElem))
+		if includeNum:
+			out.write(files[0].num)
+			out.write(". ")
+		subchaptitle = getattr(files[0], subChapElem)
+		if subchaptitle == '':
+			subchaptitle = getattr(files[0], "date")
+		elif not subchaptitle.endswith("."):
+			subchaptitle += "."
+		out.write(subchaptitle)
 		out.write("},\\label{")
 		out.write(files[0].fid)
 		out.write("}}]{")
@@ -106,7 +114,15 @@ def writePDFimports2mainTex(out, files, chapTitle, subChapElem):
 				out.write("\\includepdf[pages=1,pagecommand={")
 				out.write("\\thispagestyle{plain},")
 				out.write("\\phantomsection\\addcontentsline{toc}{subsection}{")
-				out.write(getattr(file, subChapElem))
+				if includeNum:
+					out.write(file.num)
+					out.write(". ")
+				subchaptitle = getattr(file, subChapElem)
+				if subchaptitle == '':
+					subchaptitle = getattr(file, "date")
+				elif not subchaptitle.endswith("."):
+					subchaptitle += "."
+				out.write(subchaptitle)
 				out.write("},\\label{")
 				out.write(file.fid)
 				out.write("}}]{")
@@ -121,7 +137,7 @@ def writePDFimports2mainTex(out, files, chapTitle, subChapElem):
 
 def tocWriter(files, path = '/tex/', fname = '/toc.tex'):
 	fname = getcwd() + path + fname
-	f = open(fname,'w')
+	f = open(fname,'w',encoding='utf-8')
 	f.write("%Table of contents\n")
 	f.write("\\noindent\n")
 	f.write("\\Huge{\\textbf{Contents}}\n")
@@ -140,7 +156,7 @@ def tocWriter(files, path = '/tex/', fname = '/toc.tex'):
 
 	lecture2TOCwriter(lectureFiles,f,"Lectures")
 	problemSet2TOCwriter(problemSetfiles,f,"Problem Sets")
-	examRelecant2TOCwriter(examRelevantFiles,f,"Exam relevant")
+	examRelevant2TOCwriter(examRelevantFiles,f,"Exam relevant")
 
 	f.close()
 
@@ -161,12 +177,17 @@ def lecture2TOCwriter(files,out,chapTitle):
 			out.write(file.fid)
 			out.write("]{\\textbf{")
 			out.write(file.num)
-			out.write(" ")
+			out.write(". ")
 			out.write(file.name)
-			out.write("}}. \\textit{")
+			if not file.name.endswith("."):
+				out.write(".")
+			out.write("}} \\textit{")
 			out.write(file.date)
-			out.write(".} ")
-			out.write(file.comment)
+			out.write("}. ")
+			if file.comment:
+				out.write(file.comment)
+				if not file.comment.endswith("."):
+					out.write(".")
 			out.write("\n")
 		out.write("\\end{enumerate}\n\n")
 
@@ -192,7 +213,7 @@ def problemSet2TOCwriter(files,out,chapTitle):
 			out.write(".}} \n")
 		out.write("\\end{enumerate}\n\n")
 
-def examRelecant2TOCwriter(files,out,chapTitle):
+def examRelevant2TOCwriter(files,out,chapTitle):
 	if len(files) > 0:
 		out.write("\\vspace{0.5mm}")
 		out.write("\\noindent")
@@ -208,6 +229,11 @@ def examRelecant2TOCwriter(files,out,chapTitle):
 			out.write("\\hyperref[")
 			out.write(file.fid)
 			out.write("]{")
+			if file.comment:
+				out.write(file.comment)
+				if not file.comment.endswith("."):
+					out.write(".")
+				out.write(" ")
 			out.write("\\textit{")
 			out.write(file.date)
 			out.write(".}} \n")
@@ -216,12 +242,13 @@ def examRelecant2TOCwriter(files,out,chapTitle):
 
 def runLaTeXcompiler(projFolder = "/tex/", frontPagePath = "/frontpage.tex", mainDoc = "document.tex"):
 	projPath = getcwd() + projFolder
-	copy2(getcwd()+frontPagePath,projPath+frontPagePath)
+	if not p.exists(getcwd()+frontPagePath):
+		copy2(getcwd()+frontPagePath,projPath+frontPagePath)
 	# Compile twice to ensure hyperlinks is rendered correctly
-	p = Popen(["pdflatex", "-synctex=1", "-interaction=nonstopmode", mainDoc], cwd = projPath, stdout=DEVNULL)
-	p.wait()
-	p = Popen(["pdflatex", "-synctex=1", "-interaction=nonstopmode", mainDoc], cwd = projPath, stdout=DEVNULL)
-	p.wait()
+	process = Popen(["pdflatex", "-synctex=1", "-interaction=nonstopmode", mainDoc], cwd = projPath, stdout=DEVNULL)
+	process.wait()
+	process = Popen(["pdflatex", "-synctex=1", "-interaction=nonstopmode", mainDoc], cwd = projPath, stdout=DEVNULL)
+	process.wait()
 
 
 def moveFinalPDF(srcFldr = "/tex/", srcName = "document.pdf", dest = "/Notes.pdf"):

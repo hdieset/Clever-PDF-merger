@@ -14,5 +14,5 @@ class CONFIG:
 	frontpage   = "/frontpage.tex"
 	outfile 	= "/Notes.tex"
 	field_sep   = "_"
-	comment_sep = "'"
+	comment_sep = "^"
 	delTemp     = 'n' # y/n

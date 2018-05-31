@@ -6,13 +6,13 @@ from shutil import copy2
 
 def loadConfig(fname = "config.txt"):
 	if not path.exists(fname):
-		f = open(fname,"w")
+		f = open(fname,"w",encoding='utf-8')
 		initConfigFile(f)
 		print("No config file detected. Created one. Please fill inn fields.")
 		exit()
 		return 0
 
-	with open(fname,'r') as f:
+	with open(fname,'r',encoding='utf-8') as f:
 		# Get path data from config file
 		configs = CONFIG()
 		for line in f:
@@ -40,7 +40,7 @@ def initConfigFile(f):
 	f.write("Frontpage path :/frontpage.tex\n")
 	f.write("Output filename:/Notes.pdf\n")
 	f.write("Field separator:_\n")
-	f.write("Comment between:'\n")
+	f.write("Comment between:^\n")
 	f.write("Delete temp after completion (y/n):n\n\n")
 	f.write("File scraping profiles\n")
 	f.write("Lectures     :L_date_number_name_'comment'\n")
@@ -80,39 +80,48 @@ def filenameSplitter(fnString, fid, fieldSeparator = "_", commentSeparator = "'"
 	formatted = PDF()
 
 	# Lecture case:
-	if fnList[0] == "L":
-		formatted.fname   = fnString
-		formatted.fid 	  = 'f' + str(fid)
-		formatted.type    = fnList[0]
-		formatted.date    = fnList[1]
-		formatted.time	  = fnList[2]
-		formatted.num     = fnList[3]
-		formatted.name    = fnList[4]
-		formatted.comment = fnList[5].split(commentSeparator)[1]
+	try:
+		if fnList[0] == "L":
+			formatted.fname   = fnString
+			formatted.fid 	  = 'f' + str(fid)
+			formatted.type    = fnList[0]
+			formatted.date    = fnList[1]
+			formatted.time	  = fnList[2]
+			formatted.num     = fnList[3]
+			formatted.name    = fnList[4].split(commentSeparator)[1]
+			try:
+				formatted.comment = fnList[5].split(commentSeparator)[1]
+			except IndexError:
+				pass
 
-	# Problem set case:
-	elif fnList[0] == "PS":
-		formatted.fname = fnString
-		formatted.fid   = 'f' + str(fid)
-		formatted.type  = fnList[0]
-		formatted.date  = fnList[1]
-		formatted.time  = fnList[2]
-		formatted.num   = fnList[3]
-	
-	# Exam relevant case:
-	elif fnList[0] == "ER":
-		formatted.fname   = fnString
-		formatted.fid 	  = 'f' + str(fid)
-		formatted.type    = fnList[0]
-		formatted.date    = fnList[1]
-		formatted.time	  = fnList[2]
-		formatted.comment = fnList[3].split(commentSeparator)[1]
+		# Problem set case:
+		elif fnList[0] == "PS":
+			formatted.fname = fnString
+			formatted.fid   = 'f' + str(fid)
+			formatted.type  = fnList[0]
+			formatted.date  = fnList[1]
+			formatted.time  = fnList[2]
+			formatted.num   = fnList[3]
+			if formatted.num.endswith(".pdf"):
+				formatted.num = formatted.num[:-4]
+		
+		# Exam relevant case:
+		elif fnList[0] == "ER":
+			formatted.fname   = fnString
+			formatted.fid 	  = 'f' + str(fid)
+			formatted.type    = fnList[0]
+			formatted.date    = fnList[1]
+			formatted.time	  = fnList[2]
+			formatted.comment = fnList[3].split(commentSeparator)[1]
 
-	# If not implemented file syntax:
-	else:
-		print("Filename:", fnString, "splitting failed.")
-		print("Naming convention described in config.txt not used.")
-		formatted = 0
+			# If not implemented file syntax:
+		else:
+			print("Filename:", fnString, "splitting failed.")
+			print("Naming convention described in config.txt not used.")
+			formatted = 0
+
+	except IndexError:
+		print("Filename scraping of file",fnString,"failed. Please use convention specified in config.txt")
 
 	return formatted
 
