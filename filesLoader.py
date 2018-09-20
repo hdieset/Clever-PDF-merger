@@ -35,13 +35,15 @@ def loadConfig(fname = "config.txt"):
 
 def initConfigFile(f):
 	f.write("----------------Paths----------------\n")
-	f.write("Target folder  :/target/\n")
+	f.write("Target folder  :/example docs/\n")
 	f.write("Temp folder    :/tex/\n")
-	f.write("Frontpage path :/frontpage.tex\n")
-	f.write("Output filename:/Notes.pdf\n")
+	f.write("Frontpage path :/tex/frontpage.tex\n")
+	f.write("Output filename:/Notes.pdf\n\n")
+	f.write("--------------Settings--------------\n")
 	f.write("Field separator:_\n")
 	f.write("Comment between:^\n")
 	f.write("Delete temp after completion (y/n):n\n\n")
+	f.write("-------------Filenames--------------\n")
 	f.write("File scraping profiles\n")
 	f.write("Lectures     :L_date_number_name_'comment'\n")
 	f.write("Problem set  :PS_date_number\n")
@@ -52,6 +54,7 @@ def initConfigFile(f):
 def filesLoader(filepath = "/target", fieldSeparator = "_", commentSeparator = "'"):
 	filepath = getcwd() + filepath
 	rawFileList = []
+
 	for (dirpath, dirnames, filenames) in walk(filepath):
 		rawFileList.extend(filenames)
 		break
@@ -104,6 +107,10 @@ def filenameSplitter(fnString, fid, fieldSeparator = "_", commentSeparator = "'"
 			formatted.num   = fnList[3]
 			if formatted.num.endswith(".pdf"):
 				formatted.num = formatted.num[:-4]
+			try:
+				formatted.comment = fnList[4].split(commentSeparator)[1]
+			except IndexError:
+				pass
 		
 		# Exam relevant case:
 		elif fnList[0] == "ER":

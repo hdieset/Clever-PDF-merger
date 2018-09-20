@@ -9,9 +9,9 @@ class PDF:
 	comment  = ''
 
 class CONFIG:
-	pdfFolder   = "/target/"
+	pdfFolder   = "/example docs/"
 	temp_folder = "/tex/"
-	frontpage   = "/frontpage.tex"
+	frontpage   = "/tex/frontpage.tex"
 	outfile 	= "/Notes.tex"
 	field_sep   = "_"
 	comment_sep = "^"
