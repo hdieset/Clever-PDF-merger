@@ -54,6 +54,6 @@ The following LaTeX packages are used when creating the document:
 ## Example file names
 The following three examples are based on the build in profiles;
 
-Notes taken from a lecture can be named `L_2018.05.12_21.26.38_8_Code quality, fault tolerance, redundancy_''.pdf`. A Problem Set can be named `PS_2018.05.12_21.22.54_09_.pdf`. An Exam Relevant document could be named `ER_2018.05.09_18.13.45_''.pdf`.
+Notes taken from a lecture can be named `L_2018.05.12_21.26.38_8_^Code quality, fault tolerance, redundancy^_^Introduction.^.pdf`. A Problem Set can be named `PS_2018.05.12_21.22.54_09_.pdf`. An Exam Relevant document could be named `ER_2018.05.09_18.13.45_^Notes^.pdf`.
 
 Some example documents are provided, some scribbles I made for some of my courses. Despite my ugly handwriting, they show the capabilities for the program.
